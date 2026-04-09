@@ -3,21 +3,28 @@ import {
   CorsMiddleware,
   HelmetMiddleware,
   MorganMiddleware,
+  ErrorMiddleware,
 } from "./middleware/index.js";
+import AppRoutes from "./routes/index.js";
 import {logger} from "./utils/logger.js";
 
 class App {
   public app: Application;
+  private appRouter: AppRoutes;
 
   private middlewares = [
     new CorsMiddleware(),
     new HelmetMiddleware(),
     new MorganMiddleware(),
   ];
+  private errorMiddleware = new ErrorMiddleware();
 
   constructor() {
     this.app = express();
+    this.appRouter = new AppRoutes();
     this.initializeMiddlewares();
+    this.initializeRouter();
+    this.initializeErrorHandling();
   }
 
   private initializeMiddlewares(): void {
@@ -26,6 +33,15 @@ class App {
 
     // initialize imported middlewares
     this.middlewares.forEach((middleware) => middleware.init(this.app));
+  }
+
+  private initializeErrorHandling(): void {
+    this.app.use(this.errorMiddleware.handle);
+  }
+
+  // initialize router
+  private initializeRouter(): void {
+    this.app.use("/api/v1", this.appRouter.router);
   }
 
   public listen(port: number): void {

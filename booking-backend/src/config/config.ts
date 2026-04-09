@@ -1,11 +1,6 @@
 import "dotenv/config";
 import {logger} from "../utils/logger.js";
-
-interface AppConfig {
-  allowOrigins: string;
-  environment: string;
-  port: number;
-}
+import type {AppConfig} from "../types/config.types.js";
 
 const getEnv = (key: string): string => {
   const value = process.env[key];
