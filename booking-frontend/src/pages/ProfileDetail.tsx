@@ -133,7 +133,10 @@ export default function ProfileDetailPage() {
       <div className="bg-gradient-to-r from-teal-50 to-teal-50 rounded-xl border border-teal-200 p-8">
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Ready to Book?</h3>
         <p className="text-gray-600 mb-4">Select one of the available time slots above to schedule a booking with {profile.name}.</p>
-        <button className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium">
+        <button
+          onClick={() => navigate(`/bookings/create/${profile.id}`)}
+          className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors font-medium"
+        >
           Create Booking
         </button>
       </div>

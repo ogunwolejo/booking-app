@@ -1,4 +1,36 @@
+import { useState } from 'react'
+import CreateBookingDialog from '@/components/CreateBookingDialog'
+
 export default function BookingsPage() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleBookingSubmit = async (data: {
+    profileId: string
+    slot: string
+    date: string
+  }) => {
+    setIsSubmitting(true)
+    try {
+      // TODO: Make API call to create booking
+      console.log('Creating booking:', data)
+      // await bookingService.createBooking(data)
+      setIsOpen(false)
+    } catch (error) {
+      console.error('Error creating booking:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleOpenChange = (newOpen: boolean) => {
+    // Prevent closing by clicking outside (backdrop click)
+    // Only allow programmatic close after successful submission
+    if (newOpen || isSubmitting) {
+      setIsOpen(newOpen)
+    }
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "confirmed":
@@ -14,9 +46,19 @@ export default function BookingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-4xl font-bold tracking-tight text-gray-900">Bookings</h1>
-        <p className="text-gray-600 mt-2 text-lg">View all booking reservations</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900">Bookings</h1>
+          <p className="text-gray-600 mt-2 text-lg">View all booking reservations</p>
+        </div>
+
+        {/* Create Booking Dialog */}
+        <CreateBookingDialog
+          isOpen={isOpen}
+          onOpenChange={handleOpenChange}
+          onSubmit={handleBookingSubmit}
+          isSubmitting={isSubmitting}
+        />
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">

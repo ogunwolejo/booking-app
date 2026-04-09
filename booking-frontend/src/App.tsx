@@ -2,6 +2,7 @@ import {lazy, Suspense, type JSX} from "react";
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import AppLayout from '@/layouts/AppLayout'
 import DashboardPage from '@/pages/Dashboard';
+import BookingCreatePage from '@/pages/BookingCreate'
 import { LoadingSpinner } from '@/components/Loader';
 import './index.css'
 
@@ -34,6 +35,8 @@ function App() {
           <Route path="/profiles" element={<LazyLoadedComponent Child={ProfilesPage} />} />
           <Route path="/profiles/:id" element={<LazyLoadedComponent Child={ProfileDetailPage} />} />
           <Route path="/bookings" element={<LazyLoadedComponent Child={BookingPage} />} />
+          <Route path="/bookings/create/:profileId" element={<BookingCreatePage />} />
+          <Route path="/bookings/create" element={<BookingCreatePage />} />
         </Route>
       </Routes>
     </Router>
