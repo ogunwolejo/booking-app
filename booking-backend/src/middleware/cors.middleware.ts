@@ -4,7 +4,7 @@ import config from "../config/config.js";
 
 class CorsMiddleware {
   private options: CorsOptions = {
-    origin: config.allowOrigins || "*", 
+    origin: config.allowOrigins.split(",") || "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: "*",
   };

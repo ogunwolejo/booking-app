@@ -6,3 +6,15 @@ export type Profile = {
 };
 
 export type NewProfile = Omit<Profile, "id">;
+
+export type ProfileMeta = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type Profiles = {
+  data: Profile[];
+  meta: ProfileMeta;
+};

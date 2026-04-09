@@ -1,14 +1,9 @@
-import {type Request, type Response, type NextFunction} from "express";
+import {type Request, type Response} from "express";
 import {logger} from "../utils/logger.js";
 import HttpError from "../utils/httpError.js";
 
 class ErrorMiddleware {
-  public handle = (
-    error: Error,
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): void => {
+  public handle = (error: Error, req: Request, res: Response): void => {
     logger.error(`[${req.method}] ${req.path} - ${error.message}`);
 
     if (error instanceof HttpError) {

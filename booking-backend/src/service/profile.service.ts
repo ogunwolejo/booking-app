@@ -1,4 +1,4 @@
-import type {NewProfile, Profile} from "../types/profile.types.js";
+import type {NewProfile, Profile, Profiles} from "../types/profile.types.js";
 import {v4} from "uuid";
 import HttpError from "../utils/httpError.js";
 import {logger} from "../utils/logger.js";
@@ -18,11 +18,39 @@ class ProfileService {
     );
   }
 
-  public getProfiles(): Profile[] {
+  public getProfiles(
+    page: number | undefined,
+    limit: number | undefined,
+  ): Profiles {
+    if (!page || !limit) {
+      return {
+        data: this.profiles,
+        meta: {
+          total: this.profiles.length,
+          page: 1,
+          limit: 1,
+          totalPages: 1,
+        },
+      };
+    }
+
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const data = this.profiles.slice(start, end);
+
     logger.info(
-      `Fetching all profiles. Total profiles: ${this.profiles.length}`,
+      `Fetching profiles - page: ${page}, limit: ${limit}, total: ${this.profiles.length}`,
     );
-    return this.profiles;
+
+    return {
+      data,
+      meta: {
+        total: this.profiles.length,
+        page,
+        limit: limit,
+        totalPages: Math.ceil(this.profiles.length / limit),
+      },
+    };
   }
 
   public getProfileById(id: string): Profile | undefined {
