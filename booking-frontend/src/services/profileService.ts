@@ -1,4 +1,9 @@
-import type { CreateProfilePayload, ProfilesResponse, ProfileResponse, UpdateProfilePayload } from '@/types/profile'
+import type {
+  CreateProfilePayload,
+  ProfilesResponse,
+  ProfileResponse,
+  UpdateProfilePayload,
+} from '@/types/profile'
 import apiClient from './api'
 import { AxiosError } from 'axios'
 
@@ -11,10 +16,13 @@ function handleError(error: unknown): never {
 }
 
 export const profileClient = {
-  async getProfiles({page, limit}: {page?: number, limit?: number} = {}): Promise<ProfilesResponse> {
+  async getProfiles({
+    page,
+    limit,
+  }: { page?: number; limit?: number } = {}): Promise<ProfilesResponse> {
     try {
-      const response = await apiClient.get<ProfilesResponse>('/profile', {
-        params: {page, limit}
+      const response = await apiClient.get<ProfilesResponse>('/profiles', {
+        params: { page, limit },
       })
       return response.data
     } catch (error) {
@@ -24,7 +32,7 @@ export const profileClient = {
 
   async getProfileById(id: string): Promise<ProfileResponse> {
     try {
-      const response = await apiClient.get<ProfileResponse>(`/profile/${id}`)
+      const response = await apiClient.get<ProfileResponse>(`/profiles/${id}`)
       return response.data
     } catch (error) {
       handleError(error)
@@ -33,7 +41,7 @@ export const profileClient = {
 
   async createProfile(payload: CreateProfilePayload): Promise<ProfileResponse> {
     try {
-      const response = await apiClient.post<ProfileResponse>('/profile', payload)
+      const response = await apiClient.post<ProfileResponse>('/profiles', payload)
       return response.data
     } catch (error) {
       handleError(error)
@@ -42,7 +50,7 @@ export const profileClient = {
 
   async updateProfile(id: string, payload: UpdateProfilePayload): Promise<ProfileResponse> {
     try {
-      const response = await apiClient.put<ProfileResponse>(`/profile/${id}`, payload)
+      const response = await apiClient.put<ProfileResponse>(`/profiles/${id}`, payload)
       return response.data
     } catch (error) {
       handleError(error)
@@ -51,7 +59,7 @@ export const profileClient = {
 
   async deleteProfile(id: string): Promise<void> {
     try {
-      await apiClient.delete(`/profile/${id}`)
+      await apiClient.delete(`/profiles/${id}`)
     } catch (error) {
       handleError(error)
     }

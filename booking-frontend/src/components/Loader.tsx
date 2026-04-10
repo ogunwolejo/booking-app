@@ -7,6 +7,5 @@ export function LoadingSpinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
         }`}
       />
     </div>
-  );
+  )
 }
-

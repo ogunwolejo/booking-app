@@ -18,10 +18,7 @@ class ProfileService {
     );
   }
 
-  public getProfiles(
-    page: number | undefined,
-    limit: number | undefined,
-  ): Profiles {
+  getProfiles(page: number | undefined, limit: number | undefined): Profiles {
     if (!page || !limit) {
       return {
         data: this.profiles,
@@ -53,12 +50,12 @@ class ProfileService {
     };
   }
 
-  public getProfileById(id: string): Profile | undefined {
+  getProfileById(id: string): Profile | undefined {
     const profile = this.profiles.find((profile) => profile.id === id);
     return profile;
   }
 
-  public addNewProfile(profile: NewProfile): Profile {
+  addNewProfile(profile: NewProfile): Profile {
     logger.info(
       `Attempting to create new profile - Name: ${profile.name}, Title: ${profile.title}`,
     );

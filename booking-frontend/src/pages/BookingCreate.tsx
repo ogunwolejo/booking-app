@@ -2,25 +2,25 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import BookingForm from '@/components/BookingForm'
 import { ArrowLeft } from 'lucide-react'
+import { bookingClient } from '@/services/bookingService'
+import { toast } from 'sonner'
 
 export default function BookingCreatePage() {
   const { profileId } = useParams<{ profileId?: string }>()
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleBookingSubmit = async (data: {
-    profileId: string
-    slot: string
-    date: string
-  }) => {
+  const handleBookingSubmit = async (data: { profileId: string; slot: string; date: string }) => {
     setIsSubmitting(true)
     try {
-      // TODO: Make API call to create booking
-      console.log('Creating booking:', data)
-      // await bookingService.createBooking(data)
-      navigate('/bookings', { replace: true })
+      const { profileId, date, slot } = data
+      const result = await bookingClient.createBooking({ date, profileId, slot })
+      if (result.data) {
+        navigate('/bookings', { replace: true })
+      }
     } catch (error) {
-      console.error('Error creating booking:', error)
+      const msg = (error as Error)?.message ?? 'Error creating booking:'
+      toast(msg)
     } finally {
       setIsSubmitting(false)
     }

@@ -1,5 +1,6 @@
 import {Router, type IRouter} from "express";
-import ProfileController from "../controller/profile.controller.js";
+import type ProfileController from "../controller/profile.controller.js";
+import {profileController} from "../controller/index.js";
 
 class ProfileRouter {
   public router: IRouter;
@@ -7,7 +8,7 @@ class ProfileRouter {
 
   constructor() {
     this.router = Router();
-    this.profileController = new ProfileController();
+    this.profileController = profileController;
     this.initializeRoutes();
   }
 

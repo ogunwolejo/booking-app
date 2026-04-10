@@ -2,14 +2,10 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useProfiles } from '@/contexts/ProfileContext'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import { Calendar, Clock, AlertCircle, CheckCircle } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { bookingClient } from '@/services/bookingService'
 
 // Zod validation schema
 const bookingSchema = z.object({
@@ -27,6 +23,12 @@ interface BookingFormProps {
   showDateField?: boolean
 }
 
+interface BookingSlot {
+  loading: boolean | undefined
+  slots: string[]
+  fullyBooked: undefined | boolean
+}
+
 export default function BookingForm({
   initialProfileId,
   onSubmit,
@@ -34,7 +36,7 @@ export default function BookingForm({
   showDateField = true,
 }: BookingFormProps) {
   const { profiles } = useProfiles()
-  
+
   const {
     control,
     handleSubmit,
@@ -45,10 +47,16 @@ export default function BookingForm({
     resolver: zodResolver(bookingSchema),
     mode: 'onChange',
     defaultValues: {
-      profileId: initialProfileId || '',
+      profileId: initialProfileId,
       slot: '',
       date: new Date().toISOString().split('T')[0],
     },
+  })
+
+  const [slotState, setSlotState] = useState<BookingSlot>({
+    loading: undefined,
+    slots: [],
+    fullyBooked: undefined,
   })
 
   const selectedProfileId = watch('profileId')
@@ -56,6 +64,34 @@ export default function BookingForm({
   const selectedDate = watch('date')
 
   const selectedProfile = profiles.find((p) => p.id === selectedProfileId)
+
+  const checkAvailableSlot = useCallback(async () => {
+    if (!selectedDate.length || !selectedProfileId.length) return
+
+    const resp = await bookingClient.availableProfileSlots({
+      profileId: selectedProfileId,
+      date: selectedDate,
+    })
+    return resp
+  }, [selectedDate, selectedProfileId])
+
+  useEffect(() => {
+    ;(async () => {
+      setSlotState((p) => ({ ...p, loading: true }))
+      try {
+        const slots = await checkAvailableSlot()
+        if (slots) {
+          setSlotState((p) => ({
+            ...p,
+            slots: slots.data.availableSlots,
+            fullyBooked: slots.data.fullyBooked,
+          }))
+        }
+      } finally {
+        setSlotState((p) => ({ ...p, loading: false }))
+      }
+    })()
+  }, [checkAvailableSlot])
 
   const handleFormSubmit = handleSubmit(async (data) => {
     if (onSubmit) {
@@ -79,19 +115,29 @@ export default function BookingForm({
           render={({ field }) => (
             <>
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger
-                  className={`w-full ${
-                    errors.profileId ? 'border-red-500' : ''
-                  }`}
-                >
-                  <SelectValue placeholder="Choose a professional..." />
+                <SelectTrigger className={`w-full ${errors.profileId ? 'border-red-500' : ''}`}>
+                  {field.value && selectedProfile ? (
+                    <span>{selectedProfile.name}</span>
+                  ) : (
+                    <span className="text-muted-foreground">Choose a professional...</span>
+                  )}
                 </SelectTrigger>
                 <SelectContent className="!bg-white">
                   {profiles.map((profile) => (
-                    <SelectItem key={profile.id} value={profile.id} className="!border-none">
-                      <div className="flex flex-col">
-                        <span className="font-medium">{profile.name}</span>
-                        <span className="text-sm text-gray-500">{profile.title}</span>
+                    <SelectItem
+                      key={profile.id}
+                      value={profile.id}
+                      label={profile.name}
+                      className="!border-none"
+                    >
+                      <div className="flex items-center gap-2 py-0.5">
+                        <div className="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center text-xs font-medium text-teal-700 shrink-0">
+                          {profile.name.charAt(0)}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-sm">{profile.name}</span>
+                          <span className="text-xs text-gray-500">{profile.title}</span>
+                        </div>
                       </div>
                     </SelectItem>
                   ))}
@@ -108,8 +154,40 @@ export default function BookingForm({
         />
       </div>
 
-      {/* Available Slots */}
+      {/* Booking Date */}
       {selectedProfile && (
+        <div className="space-y-3">
+          <label className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            Booking Date <span className="text-red-500">*</span>
+          </label>
+          <Controller
+            name="date"
+            control={control}
+            render={({ field }) => (
+              <>
+                <input
+                  type="date"
+                  {...field}
+                  min={minDate}
+                  className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all ${
+                    errors.date ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.date && (
+                  <p className="text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.date.message}
+                  </p>
+                )}
+              </>
+            )}
+          />
+        </div>
+      )}
+
+      {/* Available Slots */}
+      {selectedProfile && showDateField && (
         <div className="space-y-3">
           <label className="text-sm font-semibold text-gray-900">
             Select Time Slot <span className="text-red-500">*</span>
@@ -119,9 +197,9 @@ export default function BookingForm({
             control={control}
             render={({ field }) => (
               <>
-                {selectedProfile.availableSlots.length > 0 ? (
+                {slotState.slots.length > 0 ? (
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {selectedProfile.availableSlots.map((slot) => (
+                    {slotState.slots.map((slot) => (
                       <button
                         key={slot}
                         type="button"
@@ -142,47 +220,15 @@ export default function BookingForm({
                 ) : (
                   <div className="flex items-center gap-2 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <AlertCircle className="w-5 h-5 text-yellow-600" />
-                    <p className="text-sm text-yellow-700">No available slots for this professional</p>
+                    <p className="text-sm text-yellow-700">
+                      No available slots for this professional
+                    </p>
                   </div>
                 )}
                 {errors.slot && (
                   <p className="text-sm text-red-500 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
                     {errors.slot.message}
-                  </p>
-                )}
-              </>
-            )}
-          />
-        </div>
-      )}
-
-      {/* Booking Date */}
-      {showDateField && (
-        <div className="space-y-3">
-          <label className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            Booking Date <span className="text-red-500">*</span>
-          </label>
-          <Controller
-            name="date"
-            control={control}
-            render={({ field }) => (
-              <>
-                <input
-                  type="date"
-                  {...field}
-                  min={minDate}
-                  className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all ${
-                    errors.date
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-300'
-                  }`}
-                />
-                {errors.date && (
-                  <p className="text-sm text-red-500 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.date.message}
                   </p>
                 )}
               </>
@@ -208,7 +254,8 @@ export default function BookingForm({
             </li>
             {selectedDate && (
               <li>
-                <span className="font-medium">Date:</span> {new Date(selectedDate).toLocaleDateString('en-US', {
+                <span className="font-medium">Date:</span>{' '}
+                {new Date(selectedDate).toLocaleDateString('en-US', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
