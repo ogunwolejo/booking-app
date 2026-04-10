@@ -1,10 +1,9 @@
 export interface Profile {
-    name: string;
-    id: string;
-    title: string;
-    availableSlots: string[];
+  name: string
+  id: string
+  title: string
+  availableSlots: string[]
 }
-
 
 export interface CreateProfilePayload {
   name: string
@@ -26,14 +25,14 @@ export interface PaginationMeta {
 }
 
 export interface ProfilesResponse {
-  status: number;
-  data: Profile[];
+  status: number
+  data: Profile[]
   meta: PaginationMeta
-  error?: string;
+  error?: string
 }
 
 export interface ProfileResponse {
-  status: number;
-  data: Profile;
-  error?: string;
+  status: number
+  data: Profile
+  error?: string
 }

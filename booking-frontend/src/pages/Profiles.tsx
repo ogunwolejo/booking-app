@@ -1,5 +1,5 @@
-import { useProfiles } from "@/contexts/ProfileContext"
-import { Link, useNavigate } from "react-router-dom"
+import { useProfiles } from '@/contexts/ProfileContext'
+import { Link } from 'react-router-dom'
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table'
 import {
   Pagination,
   PaginationContent,
@@ -17,10 +17,9 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from '@/components/ui/pagination'
 
 export default function ProfilesPage() {
-  const navigate = useNavigate()
   const { profiles, loading, error, pagination, setPage } = useProfiles()
   const { page, totalPages, total, limit } = pagination
 
@@ -97,19 +96,20 @@ export default function ProfilesPage() {
                 </TableRow>
               ) : (
                 profiles.map((profile) => (
-                    <TableRow key={profile.id}>
-                        <TableCell className="font-medium px-8 py-5">
-                            <Link
-                                to={`/profiles/${profile.id}`}
-                                className="cursor-pointer hover:text-teal-50 transition-colors duration-150"
-                            >
-                                {profile.name}
-                            </Link>
-                        </TableCell>
-                        <TableCell className="px-8 py-5">{profile.title}</TableCell>
-                        <TableCell className="px-8 py-5">
-                        {profile.availableSlots.length} slot{profile.availableSlots.length !== 1 ? 's' : ''}
-                        </TableCell>
+                  <TableRow key={profile.id}>
+                    <TableCell className="font-medium px-8 py-5">
+                      <Link
+                        to={`/profiles/${profile.id}`}
+                        className="cursor-pointer hover:text-teal-50 transition-colors duration-150"
+                      >
+                        {profile.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="px-8 py-5">{profile.title}</TableCell>
+                    <TableCell className="px-8 py-5">
+                      {profile.availableSlots.length} slot
+                      {profile.availableSlots.length !== 1 ? 's' : ''}
+                    </TableCell>
                   </TableRow>
                 ))
               )}
@@ -124,7 +124,10 @@ export default function ProfilesPage() {
             <PaginationItem>
               <PaginationPrevious
                 href="#"
-                onClick={(e) => { e.preventDefault(); if (page > 1) setPage(page - 1) }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  if (page > 1) setPage(page - 1)
+                }}
                 aria-disabled={page === 1}
                 className={page === 1 ? 'pointer-events-none opacity-50' : ''}
               />
@@ -140,7 +143,10 @@ export default function ProfilesPage() {
                   <PaginationLink
                     href="#"
                     isActive={p === page}
-                    onClick={(e) => { e.preventDefault(); setPage(p) }}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setPage(p)
+                    }}
                   >
                     {p}
                   </PaginationLink>
@@ -151,7 +157,10 @@ export default function ProfilesPage() {
             <PaginationItem>
               <PaginationNext
                 href="#"
-                onClick={(e) => { e.preventDefault(); if (page < totalPages) setPage(page + 1) }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  if (page < totalPages) setPage(page + 1)
+                }}
                 aria-disabled={page === totalPages}
                 className={page === totalPages ? 'pointer-events-none opacity-50' : ''}
               />

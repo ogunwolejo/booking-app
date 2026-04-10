@@ -43,9 +43,12 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [])
 
-  const setPage = useCallback((page: number) => {
-    fetchProfiles(page)
-  }, [fetchProfiles])
+  const setPage = useCallback(
+    (page: number) => {
+      fetchProfiles(page)
+    },
+    [fetchProfiles]
+  )
 
   const refreshProfiles = useCallback(async () => {
     await fetchProfiles(pagination.page)
@@ -61,21 +64,24 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [fetchProfiles])
 
   return (
-    <ProfileContext.Provider value={{
-      profiles,
-      loading,
-      error,
-      pagination,
-      setPage,
-      fetchProfiles,
-      getProfileById,
-      refreshProfiles,
-    }}>
+    <ProfileContext.Provider
+      value={{
+        profiles,
+        loading,
+        error,
+        pagination,
+        setPage,
+        fetchProfiles,
+        getProfileById,
+        refreshProfiles,
+      }}
+    >
       {children}
     </ProfileContext.Provider>
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useProfiles = (): ProfileContextType => {
   const context = useContext(ProfileContext)
   if (!context) throw new Error('useProfiles must be used within a ProfileProvider')

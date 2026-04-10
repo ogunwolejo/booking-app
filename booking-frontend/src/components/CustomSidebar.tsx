@@ -1,14 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Calendar, LayoutDashboard, Users, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, Users, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useSidebar } from '@/contexts/SidebarContext'
 import './Sidebar.css'
 
 const menuItems = [
-  {
-    label: 'Dashboard',
-    href: '/',
-    icon: LayoutDashboard,
-  },
   {
     label: 'Profiles',
     href: '/profiles',
@@ -39,7 +34,9 @@ export function CustomSidebar() {
       </button>
 
       {/* Sidebar */}
-      <aside className={`custom-sidebar ${isMobileOpen ? 'mobile-open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
+      <aside
+        className={`custom-sidebar ${isMobileOpen ? 'mobile-open' : ''} ${isCollapsed ? 'collapsed' : ''}`}
+      >
         {/* Header with Collapse Button */}
         <div className="sidebar-header">
           <div className="sidebar-logo">
@@ -65,7 +62,7 @@ export function CustomSidebar() {
                 const IconComponent = item.icon
                 const active = isActive(item.href)
                 return (
-                  <li key={item.href} className='!list-none'>
+                  <li key={item.href} className="!list-none">
                     <Link
                       to={item.href}
                       className={`nav-link ${active ? 'active' : ''}`}
@@ -81,16 +78,10 @@ export function CustomSidebar() {
             </ol>
           </div>
         </nav>
-
       </aside>
 
       {/* Overlay for mobile */}
-      {isMobileOpen && (
-        <div
-          className="sidebar-overlay"
-          onClick={() => setIsMobileOpen(false)}
-        />
-      )}
+      {isMobileOpen && <div className="sidebar-overlay" onClick={() => setIsMobileOpen(false)} />}
     </>
   )
 }
